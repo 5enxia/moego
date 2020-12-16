@@ -4,12 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+    "./moego"
 )
-
-type Editor struct {
-	filePath string
-	keyChan  chan rune
-}
 
 func main() {
 	// コマンドライン引数の検証
@@ -19,6 +15,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	filepath := flag.Arg(0)
+
 	// デバッグフラグの検証
 	debug := flag.NArg() == 2 && flag.Arg(1) == "--debug"
+
+	e := moego.NewEditor(filepath, debug) // エディタを初期化
+	// e.InitTerminal() // ターミナルを初期化
+	// e.RefreshAllRows() // 画面をリフレッシュ
+	// e.SetRowCol(0, 0) // バーの位置を原点へ
+
+	// go e.ReadKey() // マルチスレッドでキーボード入力を読む
+	// go e.PollTimeEvent() // polling
+
+	// e.InterpretKey()
 }
