@@ -22,7 +22,7 @@ func main() {
 
 	e := moego.NewEditor(filepath, debug) // エディタを初期化
 	e.InitTerminal() // ターミナルを初期化
-	// e.RefreshAllRows() // 画面をリフレッシュ
+	 e.Refresh() // 画面をリフレッシュ
 	// e.SetRowCol(0, 0) // バーの位置を原点へ
 
 	// go e.ReadKey() // マルチスレッドでキーボード入力を読む
