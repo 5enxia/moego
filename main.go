@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+    "./moego"
 )
 
 func main() {
@@ -14,16 +15,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	filepath := flag.Arg(0)
+
 	// デバッグフラグの検証
 	debug := flag.NArg() == 2 && flag.Arg(1) == "--debug"
 
-	// e := NewEditor() // エディタを初期化
-    // e.InitTerminal() // ターミナルを初期化
-    // e.RefreshAllRows() // 画面をリフレッシュ
-    // e.SetRowCol(0, 0) // バーの位置を原点へ
+	e := moego.NewEditor(filepath, debug) // エディタを初期化
+	// e.InitTerminal() // ターミナルを初期化
+	// e.RefreshAllRows() // 画面をリフレッシュ
+	// e.SetRowCol(0, 0) // バーの位置を原点へ
 
-    // go e.ReadKey() // マルチスレッドでキーボード入力を読む
-    // go e.PollTimeEvent() // polling
+	// go e.ReadKey() // マルチスレッドでキーボード入力を読む
+	// go e.PollTimeEvent() // polling
 
-    // e.InterpretKey()
+	// e.InterpretKey()
 }

@@ -1,3 +1,5 @@
+package moego
+
 import (
 	"golang.org/x/sys/unix"
 )
@@ -10,13 +12,15 @@ type Row struct {
 
 type Terminal struct {
 	termios *unix.Termios
+    width int
+    height int
 }
 
 // chan: go channel
 type Editor struct {
 	filePath  string
 	keyChan   chan rune
-	timeChan  chan messageType
+	timeChan  chan MessageType
 	crow      int
 	ccol      int
 	scroolrow int
