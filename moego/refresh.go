@@ -30,7 +30,7 @@ func (e *Editor) writeRow(r *Row) {
         buf = append(buf, []byte(string(r))...)
     }
 
-    e.moveCursor(e.crow, 0)
+    e.MoveCursor(e.crow, 0)
     e.flushRow()
 
     // go highlight
