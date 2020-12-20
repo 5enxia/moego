@@ -43,7 +43,7 @@ func (e *Editor) writeRow(r *Row) {
 }
 
 func (e *Editor) flushRow() {
-    e.write([]byte("033[2J"))
+    e.write([]byte("\033[2J"))
 }
 
 func (e *Editor) highlight(buf []byte) []Color {
