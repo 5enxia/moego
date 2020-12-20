@@ -17,7 +17,7 @@ func (e *Editor) Refresh() {
 
 // ...interface{} is variable args
 // arg...
-func (e *Editor) debugPrint(arg ...interface{}) {
+func (e *Editor) DebugPrint(arg ...interface{}) {
     if e.debug {
         _, _ = fmt.Fprintln(os.Stderr, arg...)
     }

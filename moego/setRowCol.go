@@ -1,7 +1,7 @@
 package moego
 
 func (e *Editor) SetRowCol(row int, col int) {
-    if row > e.n &&  col > e.currentRow().visibleLen() {
+    if row > e.n &&  col > e.CurrentRow().visibleLen() {
         return
     }
 
@@ -40,8 +40,8 @@ func (e *Editor) setColPosition(col int) {
         col = 0
     }
 
-    if col >= e.currentRow().visibleLen() {
-        col = e.currentRow().visibleLen()
+    if col >= e.CurrentRow().visibleLen() {
+        col = e.CurrentRow().visibleLen()
     }
 
     if col >= e.terminal.width {
@@ -52,7 +52,7 @@ func (e *Editor) setColPosition(col int) {
     e.MoveCursor(e.crow, e.ccol)
 }
 
-func (e *Editor) currentRow() *Row {
+func (e *Editor) CurrentRow() *Row {
     return e.rows[e.crow + e.scroolrow]
 }
 

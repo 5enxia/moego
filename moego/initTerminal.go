@@ -7,7 +7,7 @@ import (
 
 func (e *Editor) InitTerminal() {
     e.flush()
-    e.writeHelpMenu(HELP_MESSAGE)
+    e.WriteHelpMenu(HELP_MESSAGE)
     e.writeStatusBar()
     e.MoveCursor(e.crow, e.ccol)
 }
@@ -16,7 +16,7 @@ func (e *Editor) flush() {
     e.write(([]byte("\033[2J")))
 }
 
-func (e *Editor) writeHelpMenu (message string){
+func (e *Editor) WriteHelpMenu (message string){
     prevRow, prevCol := e.crow, e.ccol
 
     for i, ch := range message {
