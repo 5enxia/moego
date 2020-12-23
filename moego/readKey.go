@@ -5,7 +5,7 @@ import (
     "unicode/utf8"
 )
 
-func (e *Editor) ReadKey() {
+func (e *Editor) readKeys() {
     buf := make([]byte, 64)
 
     // 無限ループ
@@ -20,7 +20,7 @@ func (e *Editor) ReadKey() {
                 }
 
                 e.keyChan <- r
-                b= b[n:]
+                b = b[n:]
             }
         }
     }
@@ -44,6 +44,7 @@ func (e *Editor) parseKey(buf []byte) (rune, int) {
             }
         }
     }
+
     // parse bytes as utf-8
     return utf8.DecodeRune(buf)
 }

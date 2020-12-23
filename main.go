@@ -25,7 +25,7 @@ func main() {
 	e.refresh() // 画面をリフレッシュ
 	e.setRowCol(0, 0) // バーの位置を原点へ
 
-	go e.ReadKey() // マルチスレッドでキーボード入力を読む
+	go e.readKeys() // マルチスレッドでキーボード入力を読む
     go e.PollTimerEvent() // polling
 
     e.InterpretKey()
