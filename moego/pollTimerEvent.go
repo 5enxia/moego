@@ -4,13 +4,13 @@ import (
     "time"
 )
 
-func (e *Editor) PollTimerEvent() {
+func (e *Editor) pollTimerEvent() {
     for {
         switch <- e.timeChan {
         case RESET_MESSAGE:
             t := time.NewTimer(2 * time.Second)
             <- t.C
-            e.WriteHelpMenu(HELP_MESSAGE)
+            e.writeHelpMenu(HELP_MESSAGE)
         }
     }
 }

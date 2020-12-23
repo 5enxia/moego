@@ -26,7 +26,7 @@ func main() {
 	e.setRowCol(0, 0) // バーの位置を原点へ
 
 	go e.readKeys() // マルチスレッドでキーボード入力を読む
-    go e.PollTimerEvent() // polling
+    go e.pollTimerEvent() // polling
 
-    e.InterpretKey()
+    e.interpretKey()
 }
