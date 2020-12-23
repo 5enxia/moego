@@ -8,7 +8,7 @@ import (
     "syscall"
 )
 
-func (e *Editor) Refresh() {
+func (e *Editor) refresh() {
     for i := 0; i < e.terminal.height; i++ {
         e.crow = i
         e.writeRow(e.rows[e.scroolrow+i])
@@ -17,7 +17,7 @@ func (e *Editor) Refresh() {
 
 // ...interface{} is variable args
 // arg...
-func (e *Editor) debugPrint(arg ...interface{}) {
+func (e *Editor) DebugPrint(arg ...interface{}) {
     if e.debug {
         _, _ = fmt.Fprintln(os.Stderr, arg...)
     }
@@ -30,7 +30,7 @@ func (e *Editor) writeRow(r *Row) {
         buf = append(buf, []byte(string(r))...)
     }
 
-    e.MoveCursor(e.crow, 0)
+    e.moveCursor(e.crow, 0)
     e.flushRow()
 
     // go highlight
@@ -43,7 +43,7 @@ func (e *Editor) writeRow(r *Row) {
 }
 
 func (e *Editor) flushRow() {
-    e.write([]byte("033[2J"))
+    e.write([]byte("\033[2K"))
 }
 
 func (e *Editor) highlight(buf []byte) []Color {
@@ -79,14 +79,15 @@ func (e *Editor) highlight(buf []byte) []Color {
     return colors
 }
 
-func (e *Editor) writeWithColor(buf []byte, colros []Color) {
+func (e *Editor) writeWithColor(buf []byte, colors []Color) {
     var newBuf []byte
 
-    for i, c := range colros {
+    for i, c := range colors {
         s := fmt.Sprintf("\033[%dm", c)
         newBuf = append(newBuf, []byte(s)...)
         newBuf = append(newBuf, buf[i])
     }
+
     syscall.Write(0, newBuf)
 }
 

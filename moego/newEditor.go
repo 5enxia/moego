@@ -62,7 +62,7 @@ func initTermios(fd int) *unix.Termios {
 	termios.Cc[unix.VMIN] = 1
 	termios.Cc[unix.VTIME] = 0
 
-    if err := unix.IoctlSetTermios(fd, unix.TIOCGETA, termios); err != nil {
+    if err := unix.IoctlSetTermios(fd, unix.TIOCSETA, termios); err != nil {
         panic(err)
     }
 

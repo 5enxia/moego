@@ -1,15 +1,15 @@
 package moego
 
-func (e *Editor) SetRowCol(row int, col int) {
+func (e *Editor) setRowCol(row int, col int) {
     if row > e.n &&  col > e.currentRow().visibleLen() {
         return
     }
 
-    e.setRowPosition(row)
-    e.setColPosition(col)
+    e.setRowPos(row)
+    e.setColPos(col)
 }
 
-func (e *Editor) setRowPosition(row int) {
+func (e *Editor) setRowPos(row int) {
     if row >= e.n {
         row = e.n - 1
     }
@@ -17,7 +17,7 @@ func (e *Editor) setRowPosition(row int) {
     if row < 0 {
         if e.scroolrow > 0 {
             e.scroolrow -= 1
-            e.Refresh()
+            e.refresh()
         }
 
         row = 0
@@ -28,14 +28,14 @@ func (e *Editor) setRowPosition(row int) {
             e.scroolrow += 1
         }
         row = e.terminal.height-1
-        e.Refresh()
+        e.refresh()
     }
 
     e.crow = row
-    e.MoveCursor(row, e.ccol)
+    e.moveCursor(row, e.ccol)
 }
 
-func (e *Editor) setColPosition(col int) {
+func (e *Editor) setColPos(col int) {
     if col < 0 {
         col = 0
     }
@@ -52,11 +52,6 @@ func (e *Editor) setColPosition(col int) {
     e.MoveCursor(e.crow, e.ccol)
 }
 
-func (e *Editor) currentRow() *Row {
-    return e.rows[e.crow + e.scroolrow]
-}
-
-func (r *Row) visibleLen() int {
-    return r.chars.VisibleLen()
-}
+func (e *Editor) currentRow() *Row { return e.rows[e.crow + e.scroolrow] }
+func (r *Row) visibleLen() int { return r.chars.VisibleLen() }
 
