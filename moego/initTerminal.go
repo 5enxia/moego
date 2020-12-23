@@ -5,36 +5,36 @@ import (
     "syscall"
 )
 
-func (e *Editor) InitTerminal() {
+func (e *Editor) initTerminal() {
     e.flush()
-    e.WriteHelpMenu(HELP_MESSAGE)
+    e.writeHelpMenu(HELP_MESSAGE)
     e.writeStatusBar()
-    e.MoveCursor(e.crow, e.ccol)
+    e.moveCursor(e.crow, e.ccol)
 }
 
 func (e *Editor) flush() {
     e.write(([]byte("\033[2J")))
 }
 
-func (e *Editor) WriteHelpMenu (message string){
+func (e *Editor) writeHelpMenu (message string){
     prevRow, prevCol := e.crow, e.ccol
 
     for i, ch := range message {
-        e.MoveCursor(e.terminal.height+1, i)
+        e.moveCursor(e.terminal.height+1, i)
         e.write([]byte(string(ch)))
     }
 
     // write blanks
     for i := len(message); i < e.terminal.width; i++ {
-        e.MoveCursor(e.terminal.height+1, i)
+        e.moveCursor(e.terminal.height+1, i)
         e.write([]byte{' '})
     }
 
-    e.MoveCursor(prevRow, prevCol)
+    e.moveCursor(prevRow, prevCol)
 }
 
 
-func (e *Editor) MoveCursor(row, col int) {
+func (e *Editor) moveCursor(row, col int) {
     s := fmt.Sprintf("\033[%d;%dH", row+1, col+1)
     e.write([]byte(s))
 }
@@ -50,13 +50,13 @@ func (e *Editor) writeStatusBar() {
 
     // show current text file under status-bar
     for i, ch := range e.filePath {
-        e.MoveCursor(e.terminal.height+1, i)
+        e.moveCursor(e.terminal.height+1, i)
         e.write([]byte(string(ch)))
     }
 
     // write blanks
     for i := len(e.filePath); i < e.terminal.width; i++ {
-        e.MoveCursor(e.terminal.height, i)
+        e.moveCursor(e.terminal.height, i)
         e.write([]byte{' '})
     }
 }
