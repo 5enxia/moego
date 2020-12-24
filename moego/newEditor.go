@@ -2,7 +2,6 @@ package moego
 
 import (
     "os"
-    "io/ioutil"
 	"golang.org/x/sys/unix"
 )
 
@@ -12,7 +11,7 @@ func NewEditor(filepath string, debug bool) *Editor {
     // ファイルの存在チェック
     // ファイルを読み混み＆表示
     if existsFile(filepath) {
-        e := loadFile(filepath)
+        e := LoadFile(filepath)
         e.terminal = terminal
         return e
     }
@@ -81,53 +80,6 @@ func getWindowSize(fd int) (int, int) {
 func existsFile(filepath string) bool {
     _, err := os.Stat(filepath)
     return err == nil
-}
-
-func loadFile(filepath string) *Editor {
-    e := &Editor{
-		crow:      0,
-		ccol:      0,
-		scroolrow: 0,
-		filePath:  filepath,
-		keyChan:   make(chan rune),
-		timeChan:  make(chan MessageType),
-		n:         1,
-    }
-
-    rows := makeRows()
-
-    bytes, err := ioutil.ReadFile(filepath)
-    if err != nil {
-        panic(err)
-    }
-
-    // GapTableについては要勉強
-    gt := NewGapTable(128)
-
-    for _, b := range bytes {
-		// Treat TAB as 4 spaces.
-		if b == Tab {
-			gt.AppendRune(rune(0x20))
-			gt.AppendRune(rune(0x20))
-			gt.AppendRune(rune(0x20))
-			gt.AppendRune(rune(0x20))
-			continue
-		}
-
-		// ASCII-only
-		gt.AppendRune(rune(b))
-
-		if b == '\n' {
-			rows[e.n-1] = &Row{chars: gt}
-			e.n += 1
-			gt = NewGapTable(128)
-		}
-	}
-
-	rows[e.n-1] = &Row{chars: gt}
-	e.rows = rows
-
-	return e
 }
 
 func makeRows() []*Row {

@@ -4,8 +4,6 @@ import (
     "golang.org/x/sys/unix"
     "fmt"
     "os"
-    "strings"
-    "io/ioutil"
 )
 
 func (r *Row) len() int        { return r.chars.Len() }
@@ -43,14 +41,14 @@ func (e *Editor) interpretKey() {
             for i := 0; i < 4; i++ {
                 e.insertRune(e.currentRow(), e.ccol, rune(' '))
             }
-            e.setColPosition(e.ccol + 4)
+            e.setColPos(e.ccol + 4)
 
         case Enter:
             e.newLine()
 
         case ControlS:
-            saveFile(e.filePath, e.rows)
-            e.WriteHelpMenu("Saved!")
+            SaveFile(e.filePath, e.rows)
+            e.writeHelpMenu("Saved!")
             e.timeChan <- RESET_MESSAGE
 
         case ControlP:
@@ -62,7 +60,7 @@ func (e *Editor) interpretKey() {
 
         default:
             e.insertRune(e.currentRow(), e.ccol, r)
-            e.setColPosition(e.ccol +1)
+            e.setColPos(e.ccol +1)
         }
     }
 }
@@ -125,6 +123,32 @@ func (e *Editor) backspace() {
     e.debugRowRunes()
 }
 
+// DELETE ROW
+func (e *Editor) deleteRow(row int) {
+    e.rows = append(e.rows[:row], e.rows[row+1:]...)
+    e.n -= 1
+
+    prevRowPos := e.crow
+    e.refresh()
+    e.crow = prevRowPos
+}
+
+// DELETE RUNE
+func (e *Editor) deleteRune(row *Row, col int) {
+    row.deleteAt(col)
+    e.updateRowRunes(row)
+    e.setRowCol(e.crow, e.ccol - 1)
+}
+
+func (r *Row) deleteAt (col int) {
+    if col >= r.len() {
+        return
+    }
+
+    r.chars.DeleteAt(col)
+}
+
+
 // REPLACE RUNE
 func (e *Editor) replaceRune(row int, newRune []rune) {
     gt := NewGapTable(128)
@@ -148,31 +172,54 @@ func (e *Editor) replaceRune(row int, newRune []rune) {
 // UPDATE RUNE
 func (e *Editor) updateRowRunes(row *Row) {
     if e.crow < e.terminal.height {
-        e.DebugPrint("DEBUG: row's view updated at", e.crow + e.scroolrow, "for", row.chars.Runes())
+        e.debugPrint("DEBUG: row's view updated at", e.crow + e.scroolrow, "for", row.chars.Runes())
         e.writeRow(row)
     }
 }
 
-func (e *Editor) debugDetailPrint(a ...interface{}) {
+// DEBUG PRINT
+func (e *Editor) debugPrint(a ...interface{}) {
 	if e.debug {
-		_, _ = fmt.Fprintf(os.Stderr, "%+v\n", a...)
+		_, _ = fmt.Fprintln(os.Stderr, a...)
 	}
 }
 
-func saveFile(filepath string, rows []*Row) {
-    sb := strings.Builder{}
-
-    for _, r := range rows {
-        if r.len() >= 1 {
-            for _, ch := range r.chars.Runes() {
-                sb.WriteRune(ch)
-            }
-        }
-    }
-
-    _ = ioutil.WriteFile(filepath, []byte(sb.String()), 0644)
+// INSERT RUNE
+func (e *Editor) insertRune (row *Row, col int, newRune rune) {
+    row.insertAt(col, newRune)
+    e.updateRowRunes(row)
 }
 
+// INSERT AT
+func (r *Row) insertAt (colPos int, newRune rune) {
+    if colPos > r.len() {
+        colPos = r.len()
+    }
+
+    r.chars.InsertAt(colPos, newRune)
+}
+
+// NEWLINE
+func (e *Editor) newLine() {
+    // newLine => insert line
+    currentLineRowPos := e.crow + e.scroolrow
+    currentLineRow := e.rows[currentLineRowPos]
+
+    newLineRowPos := currentLineRowPos + 1
+
+    newRowRunes := append([]rune{}, currentLineRow.chars.Runes()[e.ccol:]...)
+    e.insertRow(newLineRowPos, newRowRunes)
+
+    // update current row
+    currentRowNewRunes := append([]rune{}, currentLineRow.chars.Runes()[:e.ccol]...)
+    currentRowNewRunes = append(currentRowNewRunes, '\n')
+    e.replaceRune(e.crow + e.scroolrow, currentRowNewRunes)
+
+    e.setRowCol(e.crow + 1, 0)
+    e.debugRowRunes()
+}
+
+// INSERT ROW
 func (e *Editor) insertRow(row int, runes []rune) {
     gt := NewGapTable(128)
 
@@ -190,9 +237,19 @@ func (e *Editor) insertRow(row int, runes []rune) {
     e.reallocBufferIfNeed()
 
     prevRowPos := e.crow
-    e.Refresh()
+    e.refresh()
     e.crow = prevRowPos
 }
+
+// DEBUG ROW RUNES
+func (e *Editor) debugRowRunes() {
+    if e.debug {
+        for i := 0; i < e.n; i++ {
+            _, _ = fmt.Fprintln(os.Stderr, i, ":", e.rows[i].chars.Runes())
+        }
+    }
+}
+
 
 func (e *Editor) reallocBufferIfNeed () {
     if e.n == len(e.rows) {
@@ -203,64 +260,9 @@ func (e *Editor) reallocBufferIfNeed () {
     }
 }
 
-func (e *Editor) newLine() {
-    // newLine = insert line
-    currentLineRowPos := e.crow + e.scroolrow
-    currentLineRow := e.rows[currentLineRowPos]
-
-    newLineRowPos := e.crow + e.scroolrow
-    newRowRunes := append([]rune{}, currentLineRow.chars.Runes()[e.ccol:]...)
-    e.insertRow(newLineRowPos, newRowRunes)
-
-    currentRowNewRunes := append([]rune{}, currentLineRow.chars.Runes()[:e.ccol]...)
-    currentRowNewRunes = append(currentRowNewRunes, '\n')
-    e.replaceRune(e.crow + e.scroolrow, currentRowNewRunes)
-
-    e.setRowCol(e.crow + 1, 0)
-    e.debugRowRunes()
+// DEBUG DETAIL PRINT
+func (e *Editor) debugDetailPrint(a ...interface{}) {
+	if e.debug {
+		_, _ = fmt.Fprintf(os.Stderr, "%+v\n", a...)
+	}
 }
-
-func (e *Editor) deleteRow(row int) {
-    e.rows = append(e.rows[:row], e.rows[row+1:]...)
-    e.n -= 1
-
-    prevRowPos := e.crow
-    e.Refresh()
-    e.crow = prevRowPos
-}
-
-func (e *Editor) deleteRune(row *Row, col int) {
-    row.deleteAt(col)
-    e.updateRowRunes(row)
-    e.setRowCol(e.crow, e.ccol - 1)
-}
-
-func (r *Row) deleteAt (col int) {
-    if col >= r.len() {
-        return
-    }
-
-    r.chars.DeleteAt(col)
-}
-
-func (r *Row) insertAt (colPosition int, newRune rune) {
-    if colPosition > r.len() {
-        colPosition = r.len()
-    }
-
-    r.chars.InsertAt(colPosition, newRune)
-}
-
-func (e *Editor) insertRune (row *Row, col int, newRune rune) {
-    row.insertAt(col, newRune)
-    e.updateRowRunes(row)
-}
-
-func (e *Editor) debugRowRunes() {
-    if e.debug {
-        for i := 0; i < e.n; i++ {
-            _, _ = fmt.Fprintln(os.Stderr, i, ":", e.rows[i].chars.Runes())
-        }
-    }
-}
-

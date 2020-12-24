@@ -49,7 +49,7 @@ func (e *Editor) setColPos(col int) {
     }
 
     e.ccol = col
-    e.MoveCursor(e.crow, e.ccol)
+    e.moveCursor(e.crow, e.ccol)
 }
 
 func (e *Editor) currentRow() *Row { return e.rows[e.crow + e.scroolrow] }
