@@ -21,12 +21,12 @@ func main() {
 	debug := flag.NArg() == 2 && flag.Arg(1) == "--debug"
 
 	e := moego.NewEditor(filepath, debug) // エディタを初期化
-	e.initTerminal() // ターミナルを初期化
-	e.refresh() // 画面をリフレッシュ
-	e.setRowCol(0, 0) // バーの位置を原点へ
+	e.InitTerminal() // ターミナルを初期化
+	e.Refresh() // 画面をリフレッシュ
+	e.SetRowCol(0, 0) // バーの位置を原点へ
 
-	go e.readKeys() // マルチスレッドでキーボード入力を読む
-    go e.pollTimerEvent() // polling
+	go e.ReadKeys() // マルチスレッドでキーボード入力を読む
+    go e.PollTimerEvent() // polling
 
-    e.interpretKey()
+    e.InterpretKey()
 }
