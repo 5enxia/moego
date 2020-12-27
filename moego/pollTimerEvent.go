@@ -4,7 +4,7 @@ import (
     "time"
 )
 
-func (e *Editor) pollTimerEvent() {
+func (e *Editor) PollTimerEvent() {
     for {
         switch <- e.timeChan {
         case RESET_MESSAGE:

@@ -5,7 +5,7 @@ import (
     "syscall"
 )
 
-func (e *Editor) initTerminal() {
+func (e *Editor) InitTerminal() {
     e.flush()
     e.writeHelpMenu(HELP_MESSAGE)
     e.writeStatusBar()

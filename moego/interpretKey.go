@@ -9,14 +9,14 @@ import (
 func (r *Row) len() int        { return r.chars.Len() }
 
 // emacs like command
-func (e *Editor) interpretKey() {
+func (e *Editor) InterpretKey() {
     for {
         // recive channel
         r := <-e.keyChan
 
         switch r {
         case ControlA:
-            e.setRowCol(e.crow, 0)
+            e.SetRowCol(e.crow, 0)
 
         case ControlB, ArrowLeft:
             e.back()
@@ -26,7 +26,7 @@ func (e *Editor) interpretKey() {
             return
 
         case ControlE:
-            e.setRowCol(e.crow, e.numberOfRunesInRow())
+            e.SetRowCol(e.crow, e.numberOfRunesInRow())
 
         case ControlF, ArrowRight:
             e.next()
@@ -35,7 +35,7 @@ func (e *Editor) interpretKey() {
             e.backspace()
 
         case ControlN, ArrowDown:
-            e.setRowCol(e.crow+1, e.ccol)
+            e.SetRowCol(e.crow+1, e.ccol)
 
         case Tab:
             for i := 0; i < 4; i++ {
@@ -52,7 +52,7 @@ func (e *Editor) interpretKey() {
             e.timeChan <- RESET_MESSAGE
 
         case ControlP:
-            e.setRowCol(e.crow-1, e.ccol)
+            e.SetRowCol(e.crow-1, e.ccol)
 
         // DEBUG
         case ControlV:
@@ -69,10 +69,10 @@ func (e *Editor) interpretKey() {
 func (e *Editor) back() {
     if e.ccol == 0 {
         if e.crow > 0 {
-            e.setRowCol(e.crow-1, e.rows[e.crow + e.scroolrow-1].visibleLen())
+            e.SetRowCol(e.crow-1, e.rows[e.crow + e.scroolrow-1].visibleLen())
         }
     } else {
-        e.setRowCol(e.crow, e.ccol-1)
+        e.SetRowCol(e.crow, e.ccol-1)
     }
 }
 
@@ -90,10 +90,10 @@ func (e *Editor) numberOfRunesInRow() int { return e.currentRow().chars.Len() }
 func (e *Editor) next() {
     if e.ccol >= e.currentRow().visibleLen() {
         if e.crow+1 < e.n {
-            e.setRowCol(e.crow+1, 0)
+            e.SetRowCol(e.crow+1, 0)
         }
     } else {
-        e.setRowCol(e.crow, e.ccol+1)
+        e.SetRowCol(e.crow, e.ccol+1)
     }
 }
 
@@ -114,7 +114,7 @@ func (e *Editor) backspace() {
             // Delete the current row
             currentRowPos := e.crow + e.scroolrow
             e.deleteRow(currentRowPos)
-            e.setRowCol(e.crow - 1, prevRow.len() - 1)
+            e.SetRowCol(e.crow - 1, prevRow.len() - 1)
         }
     } else {
         e.deleteRune(row, e.ccol -1)
@@ -129,7 +129,7 @@ func (e *Editor) deleteRow(row int) {
     e.n -= 1
 
     prevRowPos := e.crow
-    e.refresh()
+    e.Refresh()
     e.crow = prevRowPos
 }
 
@@ -137,7 +137,7 @@ func (e *Editor) deleteRow(row int) {
 func (e *Editor) deleteRune(row *Row, col int) {
     row.deleteAt(col)
     e.updateRowRunes(row)
-    e.setRowCol(e.crow, e.ccol - 1)
+    e.SetRowCol(e.crow, e.ccol - 1)
 }
 
 func (r *Row) deleteAt (col int) {
@@ -215,7 +215,7 @@ func (e *Editor) newLine() {
     currentRowNewRunes = append(currentRowNewRunes, '\n')
     e.replaceRune(e.crow + e.scroolrow, currentRowNewRunes)
 
-    e.setRowCol(e.crow + 1, 0)
+    e.SetRowCol(e.crow + 1, 0)
     e.debugRowRunes()
 }
 
@@ -237,7 +237,7 @@ func (e *Editor) insertRow(row int, runes []rune) {
     e.reallocBufferIfNeed()
 
     prevRowPos := e.crow
-    e.refresh()
+    e.Refresh()
     e.crow = prevRowPos
 }
 

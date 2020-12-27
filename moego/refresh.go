@@ -8,7 +8,7 @@ import (
     "syscall"
 )
 
-func (e *Editor) refresh() {
+func (e *Editor) Refresh() {
     for i := 0; i < e.terminal.height; i++ {
         e.crow = i
         e.writeRow(e.rows[e.scroolrow+i])
