@@ -5,7 +5,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func NewEditor(filepath string, debug bool) *Editor {
+func NewEditor(filePath string, debug bool) *Editor {
 	terminal := newTerminal(0)
 
     // ファイルの存在チェック
