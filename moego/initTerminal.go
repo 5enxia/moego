@@ -45,12 +45,12 @@ func (e *Editor) write(b []byte) {
 
 func (e *Editor) writeStatusBar() {
     // set status-bar background color
-    e.setBackgroundColor(BG_CYAN)
-    defer e.setBackgroundColor(BLACK)
+    e.setBgColor(BG_CYAN)
+    defer e.setBgColor(BLACK)
 
     // show current text file under status-bar
     for i, ch := range e.filePath {
-        e.moveCursor(e.terminal.height+1, i)
+        e.moveCursor(e.terminal.height, i)
         e.write([]byte(string(ch)))
     }
 
@@ -61,7 +61,7 @@ func (e *Editor) writeStatusBar() {
     }
 }
 
-func (e *Editor) setBackgroundColor(color Color) {
+func (e *Editor) setBgColor(color Color) {
     s := fmt.Sprintf("\033[%dm", color)
     e.write([]byte(s))
 }
