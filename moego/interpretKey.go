@@ -47,7 +47,7 @@ func (e *Editor) InterpretKey() {
             e.newLine()
 
         case ControlS:
-            SaveFile(e.filePath, e.rows)
+            saveFile(e.filePath, e.rows)
             e.writeHelpMenu("Saved!")
             e.timeChan <- RESET_MESSAGE
 
