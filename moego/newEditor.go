@@ -10,8 +10,8 @@ func NewEditor(filePath string, debug bool) *Editor {
 
     // ファイルの存在チェック
     // ファイルを読み混み＆表示
-    if existsFile(filepath) {
-        e := LoadFile(filepath)
+    if existsFile(filePath) {
+        e := LoadFile(filePath)
         e.terminal = terminal
         return e
     }
@@ -22,7 +22,7 @@ func NewEditor(filePath string, debug bool) *Editor {
         ccol: 0,
         scroolrow: 0,
         rows: rows,
-        filePath: filepath,
+        filePath: filePath,
         keyChan: make(chan rune),
         timeChan: make(chan MessageType),
         terminal: terminal,
@@ -77,8 +77,8 @@ func getWindowSize(fd int) (int, int) {
     return int(ws.Col), int(ws.Row)
 }
 
-func existsFile(filepath string) bool {
-    _, err := os.Stat(filepath)
+func existsFile(filePath string) bool {
+    _, err := os.Stat(filePath)
     return err == nil
 }
 
