@@ -1,17 +1,17 @@
 package moego
 
 import (
-    "os"
+    "runtime"
 	"golang.org/x/sys/unix"
 )
 
-func NewEditor(filepath string, debug bool) *Editor {
+func NewEditor(filePath string, debug bool) *Editor {
 	terminal := newTerminal(0)
 
     // ファイルの存在チェック
     // ファイルを読み混み＆表示
-    if existsFile(filepath) {
-        e := LoadFile(filepath)
+    if existsFile(filePath) {
+        e := loadFile(filePath)
         e.terminal = terminal
         return e
     }
@@ -22,7 +22,7 @@ func NewEditor(filepath string, debug bool) *Editor {
         ccol: 0,
         scroolrow: 0,
         rows: rows,
-        filePath: filepath,
+        filePath: filePath,
         keyChan: make(chan rune),
         timeChan: make(chan MessageType),
         terminal: terminal,
@@ -32,7 +32,7 @@ func NewEditor(filepath string, debug bool) *Editor {
 }
 
 func newTerminal(fd int) *Terminal { // fd ファイルディスクリプタ
-	termios := initTermios(fd)
+	termios := makeRaw(fd)
     width, height := getWindowSize(fd)
 
     terminal := &Terminal{
@@ -44,11 +44,19 @@ func newTerminal(fd int) *Terminal { // fd ファイルディスクリプタ
     return terminal
 }
 
-func initTermios(fd int) *unix.Termios {
+func makeRaw(fd int) *unix.Termios {
 	// TIOCGETA:端末の状態をtermios構造体に格納し取得する
     // termios関数群は非同期通信ポートを制御するための汎用ターミナルインターフェース
     // ref: https://linuxjm.osdn.jp/html/LDP_man-pages/man3/termios.3.html
-	termios, err := unix.IoctlGetTermios(fd, unix.TIOCGETA)
+    var (
+        termios *unix.Termios
+        err error
+    )
+    switch goos := runtime.GOOS; goos {
+    // macOS
+    case "darwin":
+        termios, err = unix.IoctlGetTermios(fd, unix.TIOCGETA)
+    }
 	if err != nil {
 		panic(err)
 	}
@@ -69,6 +77,16 @@ func initTermios(fd int) *unix.Termios {
 }
 
 func getWindowSize(fd int) (int, int) {
+    //var (
+    //    ws *unix.Winsize
+    //    err error
+    //)
+    //switch goos := runtime.GOOS; goos {
+    //// macOS
+    //case "darwin":
+    //    ws, err := unix.IoctlGetWinsize(fd, unix.TIOCGWINSZ)
+    //}
+
     ws, err := unix.IoctlGetWinsize(fd, unix.TIOCGWINSZ)
     if err != nil {
         panic(err)
@@ -77,16 +95,11 @@ func getWindowSize(fd int) (int, int) {
     return int(ws.Col), int(ws.Row)
 }
 
-func existsFile(filepath string) bool {
-    _, err := os.Stat(filepath)
-    return err == nil
-}
-
 func makeRows() []*Row {
-    rows := make([]*Row, 1024)
+    var rows = make([]*Row, 1024)
     for i := range rows {
         rows[i] = &Row {
-            chars: NewGapTable(128), // 要勉強
+            chars: NewGapTable(128),
         }
     }
     return rows

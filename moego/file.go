@@ -1,12 +1,13 @@
 package moego
 
 import (
+    "os"
     "strings"
     "io/ioutil"
 )
 
 // LOAD FILE
-func LoadFile(filepath string) *Editor {
+func loadFile(filepath string) *Editor {
     e := &Editor{
 		crow:      0,
 		ccol:      0,
@@ -54,7 +55,7 @@ func LoadFile(filepath string) *Editor {
 }
 
 // SAVE FILE
-func SaveFile(filepath string, rows []*Row) {
+func saveFile(filepath string, rows []*Row) {
     sb := strings.Builder{}
 
     for _, r := range rows {
@@ -66,4 +67,10 @@ func SaveFile(filepath string, rows []*Row) {
     }
 
     _ = ioutil.WriteFile(filepath, []byte(sb.String()), 0644)
+}
+
+// EXISTS FILE (check file exist)
+func existsFile(filePath string) bool {
+    _, err := os.Stat(filePath)
+    return err == nil
 }
