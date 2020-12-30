@@ -1,7 +1,7 @@
 package moego
 
 func (e *Editor) SetRowCol(row int, col int) {
-    if row > e.n &&  col > e.currentRow().visibleLen() {
+    if row > e.n && col > e.currentRow().visibleLen() {
         return
     }
 
@@ -27,7 +27,7 @@ func (e *Editor) setRowPos(row int) {
         if row + e.scroolrow <= e.n {
             e.scroolrow += 1
         }
-        row = e.terminal.height-1
+        row = e.terminal.height - 1
         e.Refresh()
     }
 
