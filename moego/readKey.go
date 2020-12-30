@@ -11,7 +11,7 @@ func (e *Editor) ReadKeys() {
     // 無限ループ
     for {
         if n, err := syscall.Read(0, buf); err == nil {
-            b := buf[n:]
+            b := buf[:n]
             for {
                 r, n := e.parseKey(b)
 
