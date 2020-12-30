@@ -9,17 +9,9 @@ import (
 )
 
 func (e *Editor) Refresh() {
-    for i := 0; i < e.terminal.height; i++ {
+    for i := 0; i < e.terminal.height; i += 1 {
         e.crow = i
         e.writeRow(e.rows[e.scroolrow+i])
-    }
-}
-
-// ...interface{} is variable args
-// arg...
-func (e *Editor) DebugPrint(arg ...interface{}) {
-    if e.debug {
-        _, _ = fmt.Fprintln(os.Stderr, arg...)
     }
 }
 
@@ -44,6 +36,14 @@ func (e *Editor) writeRow(r *Row) {
 
 func (e *Editor) flushRow() {
     e.write([]byte("\033[2K"))
+}
+
+// ...interface{} is variable args
+// arg...
+func (e *Editor) DebugPrint(arg ...interface{}) {
+    if e.debug {
+        _, _ = fmt.Fprintln(os.Stderr, arg...)
+    }
 }
 
 func (e *Editor) highlight(buf []byte) []Color {
